@@ -3,12 +3,10 @@ import tkinter as tk
 from tkinter import ttk, filedialog, messagebox, simpledialog
 import os
 
-# Thèmes et style
 import sv_ttk
 import darkdetect
 from src.utils.windows_style import apply_windows_titlebar_style
 
-# Modules de l'application
 from src.logic.config_manager import ConfigManager
 from src.logic import file_processor, comment_processor
 from src.ui.favorites_view import FavoritesView
@@ -25,12 +23,10 @@ class DirectoryReaderApp(tk.Tk):
         self.title("Lecteur & Nettoyeur de Code")
         self.geometry("800x650")
 
-        # Variables d'état pour le lecteur de dossier
         self.current_directory = None
         self.mode = 'content'
         self.saved_paths = ConfigManager.load_saved_paths()
 
-        # Variables d'état pour le nettoyeur de commentaires
         self.kept_comments = ConfigManager.load_kept_comments()
         self.comment_files_to_process = []
         self.current_comment_file_index = 0
@@ -77,7 +73,7 @@ class DirectoryReaderApp(tk.Tk):
         self.comment_remover_view.pack_forget()
         self.home_button.pack_forget()
 
-        self.select_button.pack(side=tk.LEFT, before=self.copy_button)  # Rendre le bouton visible
+        self.select_button.pack(side=tk.LEFT, before=self.copy_button)
 
         self.favorites_view.saved_paths = self.saved_paths
         self.favorites_view.create_widgets()
@@ -91,7 +87,7 @@ class DirectoryReaderApp(tk.Tk):
         self.favorites_view.pack_forget()
         self.comment_remover_view.pack_forget()
         self.home_button.pack(side=tk.LEFT, padx=(0, 10), before=self.select_button)
-        self.select_button.pack(side=tk.LEFT, before=self.copy_button)  # Rendre visible
+        self.select_button.pack(side=tk.LEFT, before=self.copy_button)
         self.text_view.pack(expand=True, fill=tk.BOTH)
 
     def show_comment_remover_screen(self):
@@ -99,7 +95,7 @@ class DirectoryReaderApp(tk.Tk):
         self.favorites_view.pack_forget()
         self.home_button.pack(side=tk.LEFT, padx=(0, 10), before=self.select_button)
 
-        self.select_button.pack_forget()  # Cacher le bouton "Lire un dossier" qui n'est pas pertinent ici
+        self.select_button.pack_forget() 
 
         self.comment_remover_view.pack(expand=True, fill=tk.BOTH)
         self.status_label.config(text="Nettoyeur de commentaires")

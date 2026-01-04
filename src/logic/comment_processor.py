@@ -21,7 +21,6 @@ def get_comment_hash(comment_content):
 def _is_in_string(line, index):
     """Vérifie si un index est à l'intérieur d'une chaîne de caractères."""
     sub_line = line[:index]
-    # Simplification : on compte les guillemets. Ignore les guillemets échappés.
     single_quotes = sub_line.count("'")
     double_quotes = sub_line.count('"')
     return single_quotes % 2 != 0 or double_quotes % 2 != 0
@@ -92,10 +91,8 @@ def remove_comment_from_file(comment_info):
         start_line = comment_info["start_line"]
         end_line = comment_info["end_line"]
 
-        # Cas simple d'un commentaire qui prend toute la ligne ou plusieurs lignes
         if lines[start_line].strip().startswith('//') or '/*' in lines[start_line]:
             new_lines = lines[:start_line] + lines[end_line + 1:]
-        # Cas d'un commentaire en fin de ligne (//)
         else:
             line_content = lines[start_line]
             sl_index = line_content.find('//')

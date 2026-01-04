@@ -4,7 +4,6 @@ import json
 from tkinter import messagebox
 from src.utils.constants import APP_CONFIG_DIR, SAVED_PATHS_FILE as FAVORITES_FILE
 
-# Constante pour le nouveau fichier de configuration des commentaires
 KEPT_COMMENTS_FILE = os.path.join(APP_CONFIG_DIR, 'kept_comments.json')
 
 class ConfigManager:
@@ -17,10 +16,9 @@ class ConfigManager:
             if os.path.exists(FAVORITES_FILE):
                 with open(FAVORITES_FILE, 'r', encoding='utf-8') as f:
                     data = json.load(f)
-                # Compatibilité avec l'ancien format (liste de chaînes)
                 if data and isinstance(data[0], str):
                     saved_paths = [{'name': os.path.basename(p), 'path': p} for p in data]
-                    ConfigManager.save_paths_to_file(saved_paths) # Met à jour vers le nouveau format
+                    ConfigManager.save_paths_to_file(saved_paths) 
                     return saved_paths
                 return data
         except (IOError, json.JSONDecodeError, IndexError):

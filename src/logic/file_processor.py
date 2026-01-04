@@ -51,7 +51,6 @@ def process_directory_architecture(base_path, folders_only=False):
             is_last = i == (len(entries) - 1)
             prefix = '└── ' if is_last else '├── '
             display_name = name
-            # Utilise os.path.join pour une vérification de répertoire plus robuste
             if os.path.isdir(os.path.join(root, name)):
                 display_name += '/'
 
@@ -71,10 +70,8 @@ def process_project_directory(base_path):
     total_lines = 0
 
     for root, dirs, files in os.walk(base_path, topdown=True):
-        # Filtrage des répertoires
         dirs[:] = [d for d in dirs if not d.startswith('.')]
 
-        # Logique d'exclusion spécifique
         if 'backend' in root:
             dirs[:] = [d for d in dirs if d not in backend_exclude]
         elif 'frontend' in root:

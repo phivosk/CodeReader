@@ -2,7 +2,6 @@
 import sys
 import sv_ttk
 
-# pywinstyles n'est disponible que sur Windows
 if sys.platform == "win32":
     try:
         import pywinstyles
