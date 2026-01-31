@@ -1,4 +1,3 @@
-# src/ui/comment_remover_view.py
 import tkinter as tk
 from tkinter import ttk, scrolledtext
 
@@ -41,7 +40,6 @@ class CommentRemoverView(ttk.Frame):
         self.discard_button.config(state=tk.NORMAL)
 
     def update_display(self, file_path, comment_info, lines):
-        """Met à jour l'affichage avec le prochain commentaire à traiter."""
         self.file_path_label.config(text=f"Fichier : {file_path}")
         start = comment_info["start_line"]
         end = comment_info["end_line"]
@@ -60,7 +58,6 @@ class CommentRemoverView(ttk.Frame):
         self.enable_buttons()
 
     def show_final_message(self, message):
-        """Affiche un message de fin dans la zone de texte."""
         self.file_path_label.config(text="Terminé !")
         self.context_text.config(state=tk.NORMAL)
         self.context_text.delete(1.0, tk.END)

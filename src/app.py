@@ -1,4 +1,3 @@
-# src/app.py
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox, simpledialog
 import os
@@ -29,19 +28,16 @@ class DirectoryReaderApp(tk.Tk):
         self.current_directory = None
         self.mode = 'content'
         
-        # Chargement des configurations
         self.saved_paths = ConfigManager.load_saved_paths()
         self.kept_comments = ConfigManager.load_kept_comments()
         self.ignored_extensions = ConfigManager.load_ignored_extensions()
         self.ignored_folders = ConfigManager.load_ignored_folders()
 
-        # Variables pour le nettoyage de commentaires
         self.comment_files_to_process = []
         self.current_comment_file_index = 0
         self.current_comment_iterator = None
         self.current_comment_info = None
 
-        # --- Gestion du Threading ---
         self.msg_queue = queue.Queue()
         self.is_processing = False
 
@@ -52,7 +48,6 @@ class DirectoryReaderApp(tk.Tk):
         style = ttk.Style()
         style.configure('Danger.TButton', foreground='red')
 
-        # --- Top Bar ---
         top_frame = ttk.Frame(self, padding=(10, 5))
         top_frame.pack(fill=tk.X)
 
@@ -72,7 +67,6 @@ class DirectoryReaderApp(tk.Tk):
                                          state=tk.DISABLED)
         self.refresh_button.pack(side=tk.LEFT, padx=5)
         
-        # Label de statut avec barre de progression indéterminée
         self.status_frame = ttk.Frame(right_frame)
         self.status_frame.pack(side=tk.LEFT, padx=10)
         
@@ -80,20 +74,15 @@ class DirectoryReaderApp(tk.Tk):
         self.status_label.pack(side=tk.LEFT)
         
         self.progress_bar = ttk.Progressbar(self.status_frame, mode='indeterminate', length=100)
-        # On ne l'affiche que pendant le chargement
 
-        # --- Main Container ---
         self.main_container = ttk.Frame(self)
         self.main_container.pack(expand=True, fill=tk.BOTH, padx=10, pady=5)
 
-        # --- Views ---
         self.favorites_view = FavoritesView(self.main_container, self, self.saved_paths)
         self.text_view = TextView(self.main_container)
         self.comment_remover_view = CommentRemoverView(self.main_container, self)
         self.settings_view = SettingsView(self.main_container, self)
 
-    # ... (Les méthodes show_favorites_screen, show_settings_screen, etc. restent inchangées) ...
-    # Je les inclus rapidement pour la complétude, assure-toi de garder tes versions si tu as changé d'autres choses.
 
     def show_favorites_screen(self):
         self._hide_all_views()
@@ -132,7 +121,6 @@ class DirectoryReaderApp(tk.Tk):
         self.status_label.config(text="Configuration")
 
     def _hide_all_views(self):
-        """Helper pour cacher toutes les vues."""
         self.favorites_view.pack_forget()
         self.text_view.pack_forget()
         self.comment_remover_view.pack_forget()
@@ -146,11 +134,9 @@ class DirectoryReaderApp(tk.Tk):
         for btn in [self.copy_button, self.refresh_button, self.save_button]:
             btn.config(state=tk.NORMAL)
 
-    # ... (Méthodes pour les commentaires : start_comment_scan, etc. restent inchangées) ...
     def start_comment_scan(self):
         project_path = filedialog.askdirectory(title="Choisissez un projet (Dart/Python)")
         if not project_path: return
-        # Utilisation de la nouvelle fonction find_code_files
         self.comment_files_to_process = comment_processor.find_code_files(project_path)
         if not self.comment_files_to_process:
             messagebox.showinfo("Information", "Aucun fichier .dart ou .py n'a été trouvé.")
@@ -194,7 +180,6 @@ class DirectoryReaderApp(tk.Tk):
             else:
                 self.show_next_comment()
 
-    # --- Gestion de la sélection de dossier et du Threading ---
 
     def select_directory(self, mode):
         directory_path = filedialog.askdirectory(title="Choisissez un répertoire")
@@ -225,29 +210,23 @@ class DirectoryReaderApp(tk.Tk):
         messagebox.showinfo("Succès", "Paramètres sauvegardés.")
         self.show_favorites_screen()
 
-    # === C'est ici que la magie opère pour éviter le crash ===
     
     def load_directory_content(self):
-        """Lance le thread de chargement."""
         self.show_text_area_screen()
         self.text_view.clear()
         self._disable_action_buttons()
         
-        # UI Feedback
         self.status_label.config(text="Chargement en cours...")
         self.progress_bar.pack(side=tk.LEFT, padx=5)
         self.progress_bar.start(10)
 
         self.is_processing = True
         
-        # Lancer le travail lourd dans un thread séparé
         threading.Thread(target=self._background_scan_task, daemon=True).start()
         
-        # Lancer la surveillance de la queue
         self.after(100, self._process_queue_msg)
 
     def _background_scan_task(self):
-        """Exécuté dans un Thread séparé. Ne touche PAS à l'UI ici."""
         try:
             processor = None
             if self.mode == 'project_scan':
@@ -269,12 +248,11 @@ class DirectoryReaderApp(tk.Tk):
                 count = 0
                 
                 for type, *args in processor:
-                    if not self.is_processing: break # Permet d'annuler si besoin
+                    if not self.is_processing: break
                     
                     if type == "data":
                         if self.mode in ['content', 'project_scan']:
                             header, content, total_lines = args
-                            # On envoie par blocs pour éviter de spammer la queue
                             self.msg_queue.put(("append", header + content))
                             self.msg_queue.put(("status", f"Lignes lues : {total_lines}"))
                         else:
@@ -288,9 +266,7 @@ class DirectoryReaderApp(tk.Tk):
             self.msg_queue.put(("error", str(e)))
 
     def _process_queue_msg(self):
-        """Exécuté sur le Main Thread. Met à jour l'UI."""
         try:
-            # On traite jusqu'à 50 messages à la fois pour garder l'UI fluide
             for _ in range(50): 
                 msg_type, data = self.msg_queue.get_nowait()
                 
@@ -302,9 +278,8 @@ class DirectoryReaderApp(tk.Tk):
                     messagebox.showerror("Erreur", f"Erreur durant le scan : {data}")
                 elif msg_type == "done":
                     self._finish_loading()
-                    return # Stop checking queue
+                    return
                 
-            # Si on n'a pas fini, on se rappelle dans 50ms
             if self.is_processing:
                 self.after(50, self._process_queue_msg)
                 
@@ -320,7 +295,6 @@ class DirectoryReaderApp(tk.Tk):
         if self.text_view.get_content() == "":
             self.text_view.append_text("Aucun contenu trouvé avec les filtres actuels.")
 
-    # ... (Autres méthodes : save_current_path, delete_favorite, refresh, copy) ...
     def save_current_path(self):
         if not self.current_directory: return
         if any(item['path'] == self.current_directory for item in self.saved_paths):

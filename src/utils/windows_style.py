@@ -1,4 +1,3 @@
-# src/utils/windows_style.py
 import sys
 import sv_ttk
 
@@ -12,7 +11,6 @@ else:
 
 
 def apply_windows_titlebar_style(root):
-    """Applique le thème sombre/clair à la barre de titre sur Windows."""
     if not pywinstyles or not sys.platform == "win32":
         return
 

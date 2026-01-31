@@ -1,4 +1,3 @@
-# src/ui/text_view.py
 import tkinter as tk
 from tkinter import ttk, scrolledtext
 

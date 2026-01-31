@@ -1,4 +1,3 @@
-# src/ui/favorites_view.py
 import tkinter as tk
 from tkinter import ttk
 
@@ -11,7 +10,6 @@ class FavoritesView(ttk.Frame):
         self.create_widgets()
 
     def _truncate_text(self, text, max_length):
-        """Tronque le texte s'il dépasse une longueur maximale et ajoute '...'."""
         if len(text) > max_length:
             return text[:max_length - 3] + "..."
         return text
@@ -61,18 +59,15 @@ class FavoritesView(ttk.Frame):
                 delete_button.pack(side=tk.RIGHT, padx=(10, 0))
                 item_frame.pack(fill=tk.X, padx=50, pady=4)
 
-        # --- Barre du bas ---
         bottom_frame = ttk.Frame(self, padding=(10, 10))
         bottom_frame.pack(side=tk.BOTTOM, fill=tk.X)
         
-        # Bouton Nettoyeur à Gauche
         comment_remover_button = ttk.Button(
             bottom_frame, text="Nettoyer les commentaires...",
             command=self.controller.show_comment_remover_screen
         )
         comment_remover_button.pack(side=tk.LEFT)
         
-        # Bouton Menu "Hamburger" à Droite (Icône seule)
         options_menubutton = ttk.Menubutton(bottom_frame, text="☰")
         menu = tk.Menu(options_menubutton, tearoff=0)
         options_menubutton.config(menu=menu)
@@ -84,7 +79,6 @@ class FavoritesView(ttk.Frame):
         
         options_menubutton.pack(side=tk.RIGHT)
 
-        # 2. Bouton Paramètres (juste à gauche du menu)
         settings_button = ttk.Button(
             bottom_frame, text="⚙️", 
             command=self.controller.show_settings_screen

@@ -1,4 +1,3 @@
-# src/utils/constants.py
 import os
 
 APP_CONFIG_DIR = os.path.join(os.path.expanduser('~'), '.DirectoryReaderApp')
