@@ -148,11 +148,12 @@ class DirectoryReaderApp(tk.Tk):
 
     # ... (Méthodes pour les commentaires : start_comment_scan, etc. restent inchangées) ...
     def start_comment_scan(self):
-        project_path = filedialog.askdirectory(title="Choisissez un projet Flutter/Dart")
+        project_path = filedialog.askdirectory(title="Choisissez un projet (Dart/Python)")
         if not project_path: return
-        self.comment_files_to_process = comment_processor.find_dart_files(project_path)
+        # Utilisation de la nouvelle fonction find_code_files
+        self.comment_files_to_process = comment_processor.find_code_files(project_path)
         if not self.comment_files_to_process:
-            messagebox.showinfo("Information", "Aucun fichier .dart n'a été trouvé.")
+            messagebox.showinfo("Information", "Aucun fichier .dart ou .py n'a été trouvé.")
             return
         self.current_comment_file_index = 0
         self.process_next_comment_file()
