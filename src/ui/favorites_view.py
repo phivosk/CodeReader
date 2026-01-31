@@ -8,7 +8,6 @@ class FavoritesView(ttk.Frame):
         super().__init__(parent, **kwargs)
         self.controller = controller
         self.saved_paths = saved_paths
-
         self.create_widgets()
 
     def _truncate_text(self, text, max_length):
@@ -62,29 +61,32 @@ class FavoritesView(ttk.Frame):
                 delete_button.pack(side=tk.RIGHT, padx=(10, 0))
                 item_frame.pack(fill=tk.X, padx=50, pady=4)
 
+        # --- Barre du bas ---
         bottom_frame = ttk.Frame(self, padding=(10, 10))
         bottom_frame.pack(side=tk.BOTTOM, fill=tk.X)
-
+        
+        # Bouton Nettoyeur à Gauche
         comment_remover_button = ttk.Button(
             bottom_frame, text="Nettoyer les commentaires...",
             command=self.controller.show_comment_remover_screen
         )
         comment_remover_button.pack(side=tk.LEFT)
+        
+        # Bouton Menu "Hamburger" à Droite (Icône seule)
+        options_menubutton = ttk.Menubutton(bottom_frame, text="☰")
+        menu = tk.Menu(options_menubutton, tearoff=0)
+        options_menubutton.config(menu=menu)
 
-        project_scan_button = ttk.Button(
-            bottom_frame, text="Scanner un projet (Py/C#)...",
-            command=self.controller.select_directory_for_project_scan
-        )
-        project_scan_button.pack(side=tk.LEFT, padx=(10, 0))
+        menu.add_command(label="Scanner un projet (Py/C#)...", command=self.controller.select_directory_for_project_scan)
+        menu.add_separator()
+        menu.add_command(label="Afficher l'architecture complète...", command=self.controller.select_directory_for_architecture)
+        menu.add_command(label="Afficher les dossiers seuls...", command=self.controller.select_directory_for_folders_only)
+        
+        options_menubutton.pack(side=tk.RIGHT)
 
-        folders_only_button = ttk.Button(
-            bottom_frame, text="Afficher les dossiers seuls...",
-            command=self.controller.select_directory_for_folders_only
+        # 2. Bouton Paramètres (juste à gauche du menu)
+        settings_button = ttk.Button(
+            bottom_frame, text="⚙️", 
+            command=self.controller.show_settings_screen
         )
-        folders_only_button.pack(side=tk.RIGHT, padx=(5, 0))
-
-        architecture_button = ttk.Button(
-            bottom_frame, text="Afficher l'architecture complète...",
-            command=self.controller.select_directory_for_architecture
-        )
-        architecture_button.pack(side=tk.RIGHT)
+        settings_button.pack(side=tk.RIGHT, padx=(0, 5))
