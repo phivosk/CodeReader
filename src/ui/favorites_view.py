@@ -40,14 +40,25 @@ class FavoritesView(ttk.Frame):
                 truncated_name = self._truncate_text(fav_item['name'], 50)
                 truncated_path = self._truncate_text(fav_item['path'], 70)
 
-                name_label = ttk.Label(content_frame, text=truncated_name, font=("Segoe UI Variable", 12, "bold"),
-                                       anchor='w')
-                path_label = ttk.Label(content_frame, text=truncated_path, style="Secondary.TLabel", anchor='w')
+                # Récupération du mode avec 'content' par défaut si absent
+                saved_mode = fav_item.get('mode', 'content')
+                # Affichage discret : mode en suffixe, sans emoji ni capitales
+                mode_display = "flutter" if saved_mode == 'flutter' else saved_mode
+
+                name_label = ttk.Label(content_frame, text=truncated_name, 
+                                     font=("Segoe UI Variable", 12, "bold"), anchor='w')
+                path_label = ttk.Label(
+                    content_frame,
+                    text=f"{truncated_path}  · {mode_display}",
+                    style="Secondary.TLabel",
+                    anchor='w'
+                )
                 name_label.pack(fill=tk.X)
                 path_label.pack(fill=tk.X)
 
+                # MODIFICATION ICI : On passe path ET mode à la lambda
                 for widget in [content_frame, name_label, path_label]:
-                    widget.bind("<Button-1>", lambda e, p=fav_item['path']: self.controller.load_favorite(p))
+                    widget.bind("<Button-1>", lambda e, p=fav_item['path'], m=saved_mode: self.controller.load_favorite(p, m))
 
                 content_frame.pack(side=tk.LEFT, fill=tk.X, expand=True)
 
@@ -72,6 +83,8 @@ class FavoritesView(ttk.Frame):
         menu = tk.Menu(options_menubutton, tearoff=0)
         options_menubutton.config(menu=menu)
 
+        menu.add_command(label="Scanner un projet Flutter...", command=self.controller.select_directory_for_flutter_scan)
+        menu.add_separator()
         menu.add_command(label="Scanner un projet (Py/C#)...", command=self.controller.select_directory_for_project_scan)
         menu.add_separator()
         menu.add_command(label="Afficher l'architecture complète...", command=self.controller.select_directory_for_architecture)

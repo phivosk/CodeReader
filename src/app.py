@@ -192,11 +192,14 @@ class DirectoryReaderApp(tk.Tk):
     def select_directory_for_architecture(self): self.select_directory('architecture')
     def select_directory_for_folders_only(self): self.select_directory('folders_only')
     def select_directory_for_project_scan(self): self.select_directory('project_scan')
+    def select_directory_for_flutter_scan(self):
+        self.select_directory('flutter')
 
-    def load_favorite(self, path):
+    def load_favorite(self, path, mode='content'):
+        """Charge un favori avec son mode spécifique."""
         if os.path.isdir(path):
             self.current_directory = path
-            self.mode = 'content'
+            self.mode = mode  # On applique le mode sauvegardé (ex: 'flutter')
             self.load_directory_content()
         else:
             if messagebox.askyesno("Erreur", f"Chemin introuvable :\n{path}\nSupprimer ?"):
@@ -233,6 +236,10 @@ class DirectoryReaderApp(tk.Tk):
                 processor = file_processor.process_project_directory(
                     self.current_directory, self.ignored_extensions, self.ignored_folders
                 )
+            elif self.mode == 'flutter':
+                processor = file_processor.process_flutter_project(
+                    self.current_directory, self.ignored_extensions, self.ignored_folders
+                )
             elif self.mode == 'content':
                 processor = file_processor.process_directory_content(
                     self.current_directory, self.ignored_extensions, self.ignored_folders
@@ -251,7 +258,7 @@ class DirectoryReaderApp(tk.Tk):
                     if not self.is_processing: break
                     
                     if type == "data":
-                        if self.mode in ['content', 'project_scan']:
+                        if self.mode in ['content', 'project_scan', 'flutter']:
                             header, content, total_lines = args
                             self.msg_queue.put(("append", header + content))
                             self.msg_queue.put(("status", f"Lignes lues : {total_lines}"))
@@ -297,15 +304,21 @@ class DirectoryReaderApp(tk.Tk):
 
     def save_current_path(self):
         if not self.current_directory: return
+        # Vérification si déjà existant (sur le path uniquement)
         if any(item['path'] == self.current_directory for item in self.saved_paths):
-            messagebox.showinfo("Info", "Déjà favori.")
+            messagebox.showinfo("Info", "Ce dossier est déjà dans les favoris.")
             return
         default_name = os.path.basename(self.current_directory)
         fav_name = simpledialog.askstring("Favori", "Nom :", initialvalue=default_name)
         if fav_name:
-            self.saved_paths.append({'name': fav_name, 'path': self.current_directory})
+            # ON SAUVEGARDE LE MODE ACTUEL (self.mode)
+            self.saved_paths.append({
+                'name': fav_name, 
+                'path': self.current_directory, 
+                'mode': self.mode 
+            })
             ConfigManager.save_paths_to_file(self.saved_paths)
-            messagebox.showinfo("Sauvegardé", "Ajouté aux favoris.")
+            messagebox.showinfo("Sauvegardé", f"Ajouté aux favoris en mode '{self.mode}'.")
 
     def delete_favorite(self, path):
         if messagebox.askyesno("Confirmer", "Supprimer ce favori ?"):

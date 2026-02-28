@@ -26,10 +26,15 @@ class ConfigManager:
             if os.path.exists(FAVORITES_FILE):
                 with open(FAVORITES_FILE, 'r', encoding='utf-8') as f:
                     data = json.load(f)
+                # Gestion compatibilité : conversion ancienne liste de strings -> liste de dicts
                 if data and isinstance(data[0], str):
-                    saved_paths = [{'name': os.path.basename(p), 'path': p} for p in data]
+                    saved_paths = [{'name': os.path.basename(p), 'path': p, 'mode': 'content'} for p in data]
                     ConfigManager.save_paths_to_file(saved_paths) 
                     return saved_paths
+                # Gestion compatibilité : ajout du champ 'mode' si absent dans les dicts existants
+                for item in data:
+                    if 'mode' not in item:
+                        item['mode'] = 'content'
                 return data
         except (IOError, json.JSONDecodeError, IndexError):
             return []
